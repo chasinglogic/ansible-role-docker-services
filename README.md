@@ -78,7 +78,9 @@ docker_services:
     # service. {{ Defaults to image_name + '-docker' }}
     service_name: nginx
     # Optional: Define the targets / services this SystemD service
-    # must start after. This is a YAML list not a string.
+    # must start after. This is a YAML list not a string. If using this note
+    # that you probably want to add docker.service as an after. This is done by
+    # default if after is not set.
     after:
       - network.target
     # Optional: Define the timeout for starting this SystemD
