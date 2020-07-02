@@ -1,0 +1,8 @@
+---
+
+- name: "restart docker service"
+  systemd:
+    name: "{{ __docker_service_name }}"
+    state: restarted
+    enabled: true
+    daemon_reload: true

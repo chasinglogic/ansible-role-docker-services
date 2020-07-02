@@ -1,0 +1,37 @@
+---
+
+- name: Generate service name
+  set_fact:
+    __docker_service_name: "{{ service.service_name | default(service.image_name + '-docker') }}"
+
+- name: Create network
+  docker_network:
+    name: "{{ service.network }}"
+  when: service.network is defined
+
+- name: "Download {{ service.image_name }}:{{ service.image_tag | default('latest') }} image"
+  become: true
+  become_user: root
+  docker_image:
+    name: "{{ service.image_name }}"
+    tag: "{{ service.image_tag | default('latest') }}"
+    state: present
+    source: pull
+  notify: "restart docker service"
+
+- name: "Install {{ __docker_service_name }} service"
+  become: true
+  become_user: root
+  template:
+    src: "docker_container.service"
+    dest: '/etc/systemd/system/{{ __docker_service_name }}.service'
+  notify: "restart docker service"
+
+- name: "Ensure service is started and enabled"
+  become: true
+  become_user: root
+  systemd:
+    name: "{{ __docker_service_name }}"
+    state: started
+    enabled: true
+    daemon_reload: true

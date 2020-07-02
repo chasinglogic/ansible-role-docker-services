@@ -1,0 +1,40 @@
+---
+- become: true
+  name: Converge
+  hosts: all
+  pre_tasks:
+    - name: Create /etc/containers
+      become: true
+      become_user: root
+      file:
+        state: directory
+        path: /etc/containers
+    # Without the VFS configuration docker will fail to run inside of the
+    # containers because you can't recursively overlay filesystems.
+    - name: Configure docker to run with vfs inside this container
+      copy:
+        content: |
+          [storage]
+          driver = "vfs"
+          runroot = "/run/user/0"
+          graphroot = "/root/.local/share/containers/storage"
+          [storage.options]
+          mount_program = ""
+        dest: /etc/containers/storage.conf
+    - name: Configure libpod with absolute paths so vfs doesn't complain
+      copy:
+        content: |
+          static_dir="/libpod/static"
+          volume_path="/libpod/volumes"
+        dest: /etc/containers/libpod.conf
+    - name: Install tools required for testinfra
+      package:
+        name:
+          - curl
+          - net-tools
+    - name: Create index.html for testinfra tests
+      copy:
+        dest: /tmp/index.html
+        content: Hello World
+  roles:
+    - role: ansible-role-docker-containers

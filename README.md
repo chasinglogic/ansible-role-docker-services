@@ -45,6 +45,10 @@ docker_services:
     image_tag: mainline
     # Optional: Description that will be added to the SystemD service file
     description: Web host
+    # Optional: String name of the network to be passed as the --network flag.
+    # If the network does not exist it will be created. This can be used to allow
+    # multiple services to network with each other.
+    network: somenetwork
     # Optional: List of ports to publish. Takes the same form as the
     # docker CLI that is to say: host-port:container-port. This is
     # just piped directly to the '--publish' flag so binding IPs work

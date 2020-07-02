@@ -1,0 +1,48 @@
+[Unit]
+Description={{ service.description | default("A docker service") }}
+{% if service.target is defined %}
+After={{ service.after | join(',') }}
+{% endif %}
+
+[Service]
+Type=simple
+TimeoutStartSec={{ service.timeout_start_sec | default("5m") }}
+{% if service.user is defined %}
+User={{ service.user }}
+{% endif %}
+{% if service.group is defined %}
+Group={{ service.group }}
+{% endif %}
+
+ExecStartPre=-/usr/bin/docker rm "{{ __docker_service_name }}"
+ExecStart=/usr/bin/docker run \
+    --name {{ __docker_service_name }} \
+    {% if service.hostname is defined %}
+    --hostname {{ service.hostname }} \
+    {% endif %}
+    {% if service.network is defined %}
+    --network {{ service.network }} \
+    {% endif %}
+    {% if service.publish is defined %}{% for publish in service.publish %}
+    --publish {{ publish }} \
+    {% endfor %}{% endif %}
+    {% if service.volumes is defined %}{% for volume in service.volumes %}
+    -v {{ volume }} \
+    {% endfor %}{% endif %}
+    {% if service.env_vars is defined %}{% for env in service.env_vars %}
+    -e {{ env }} \
+    {% endfor %}{% endif %}
+    {{ service.image_name }}:{{ service.image_tag | default('latest') }}
+
+ExecReload=-/usr/bin/docker stop "{{ __docker_service_name }}"
+ExecReload=-/usr/bin/docker rm "{{ __docker_service_name }}"
+ExecStop=-/usr/bin/docker stop "{{ __docker_service_name }}"
+Restart={{ service.restart | default('always') }}
+RestartSec={{ service.restart_sec | default(30) }}
+
+{% if service.install is defined %}
+[Install]
+{% if service.install.wanted_by is defined %}
+WantedBy={{ service.install.wanted_by | join(',') }}
+{% endif %}
+{% endif %}

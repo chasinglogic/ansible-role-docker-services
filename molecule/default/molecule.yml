@@ -1,0 +1,46 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+lint:
+  name: yamllint
+platforms:
+  - name: "Fedora30"
+    image: fedora:30
+    privileged: True
+    command: /sbin/init
+    tmpfs:
+      - /run
+      - /tmp
+      - /sys/fs/cgroup
+  - name: "Ubuntu1804"
+    image: ubuntu:xenial
+    privileged: True
+    command: /sbin/init
+    tmpfs:
+      - /run
+      - /tmp
+      - /sys/fs/cgroup
+provisioner:
+  name: ansible
+  inventory:
+    group_vars:
+      all:
+        docker_services:
+          - image_name: nginx
+            image_tag: mainline
+            description: Web host
+            publish:
+              - '80:80'
+            volumes:
+              - '/tmp:/usr/share/nginx/html:ro'
+    host_vars:
+      Fedora30:
+        ansible_python_interpreter: python3
+  lint:
+    name: ansible-lint
+verifier:
+  name: testinfra
+  lint:
+    name: flake8

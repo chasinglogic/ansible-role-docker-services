@@ -1,0 +1,11 @@
+---
+- name: Install docker python library
+  pip:
+    executable: pip3
+    name: docker
+    state: present
+
+- include_tasks: docker_service.yml
+  loop: "{{ docker_services }}"
+  loop_control:
+    loop_var: service
