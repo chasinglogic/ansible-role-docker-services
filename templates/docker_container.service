@@ -2,6 +2,8 @@
 Description={{ service.description | default("A docker service") }}
 {% if service.target is defined %}
 After={{ service.after | join(',') }}
+{% else %}
+After=docker.service
 {% endif %}
 
 [Service]
