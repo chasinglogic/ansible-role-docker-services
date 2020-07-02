@@ -1,6 +1,6 @@
 ---
 galaxy_info:
-  role_name: docker_containers
+  role_name: docker_services
   author: Mathew Robinson
   description: Manage services and containers with docker
   license: MIT
