@@ -3,8 +3,6 @@ Ansible role for docker
 
 Manage services and containers with docker
 
-[![CircleCI](https://img.shields.io/circleci/build/github/chasinglogic/ansible-role-docker/master?style=flat-square)](https://circleci.com/gh/chasinglogic/ansible-role-docker)
-
 Usage
 -----
 
